@@ -190,7 +190,8 @@ class BigQueryAvroUtils {
         // Avro will use a CharSequence to represent String objects, but it may not always use
         // java.lang.String; for example, it may prefer org.apache.avro.util.Utf8.
         verify(v instanceof CharSequence, "Expected CharSequence (String), got %s", v.getClass());
-        return v.toString();
+        String s = v.toString();
+        return s;
       case "INTEGER":
         verify(v instanceof Long, "Expected Long, got %s", v.getClass());
         return ((Long) v).toString();

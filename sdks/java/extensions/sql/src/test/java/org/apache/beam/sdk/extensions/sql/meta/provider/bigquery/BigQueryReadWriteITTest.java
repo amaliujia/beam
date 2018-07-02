@@ -61,7 +61,7 @@ import org.junit.runners.JUnit4;
 
 /** Integration tests form writing to BigQuery with Beam SQL. */
 @RunWith(JUnit4.class)
-public class BigQueryReadWriteIT implements Serializable {
+public class BigQueryReadWriteITTest implements Serializable {
   private static final Schema SOURCE_SCHEMA =
       Schema.builder()
           .addNullableField("id", INT64)

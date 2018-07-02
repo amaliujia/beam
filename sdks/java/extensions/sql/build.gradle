@@ -138,6 +138,21 @@ idea {
   }
 }
 
+test {
+  def gcpProject = project.findProperty('gcpProject') ?: 'google.com:clouddfe'
+  def gcsTempRoot = project.findProperty('gcsTempRoot') ?: 'gs://ruwang-test/'
+
+  // Disable Gradle cache (it should not be used because the IT's won't run).
+  outputs.upToDateWhen { false }
+
+  def pipelineOptions = [
+          "--project=${gcpProject}",
+          "--tempLocation=${gcsTempRoot}",
+          "--blockOnRun=false"]
+
+  systemProperty "beamTestPipelineOptions", JsonOutput.toJson(pipelineOptions)
+}
+
 // Run basic SQL example
 task runBasicExample(type: JavaExec) {
   description = "Run basic SQL example"

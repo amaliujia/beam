@@ -17,12 +17,21 @@
  */
 package org.apache.beam.sdk.io.gcp.bigquery;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.UTF_16;
+import static java.nio.charset.StandardCharsets.UTF_16LE;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.beam.sdk.schemas.Schema.Field;
 import org.apache.beam.sdk.schemas.Schema.TypeName;
 import org.joda.time.Instant;
+import sun.nio.cs.US_ASCII;
 
 /** Utils to help convert Apache Avro types to Beam types. */
 public class AvroUtils {
@@ -99,7 +108,8 @@ public class AvroUtils {
       case BOOLEAN:
         return (Boolean) value;
       case DECIMAL:
-        return BigDecimal.valueOf((double) value);
+        String s = new String(((ByteBuffer) value).array(), StandardCharsets.UTF_8);
+        return new BigDecimal(s);
       case STRING:
         return convertAvroString(value);
       default:

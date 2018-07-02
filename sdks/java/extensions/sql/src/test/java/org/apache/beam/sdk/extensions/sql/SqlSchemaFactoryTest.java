@@ -55,6 +55,13 @@ public class SqlSchemaFactoryTest {
   @Rule public ExpectedException thrown = ExpectedException.none();
 
   @Test
+  public void test() {
+    BigDecimal bigDecimal = new BigDecimal("123.12");
+    BigDecimal another = new BigDecimal(bigDecimal.toString());
+    another.toString();
+  }
+
+  @Test
   public void testContainsCorrectFields() throws Exception {
     SchemaFactory factory = new DefaultSchemaFactory();
 
