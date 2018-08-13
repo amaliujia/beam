@@ -185,10 +185,19 @@ public class BeamSqlBuiltinFunctionsIntegrationTestBase {
     private static ExpressionTestCase of(
         String sqlExpr, Object expectedResult, FieldType resultFieldType) {
       return new AutoValue_BeamSqlBuiltinFunctionsIntegrationTestBase_ExpressionTestCase(
-          sqlExpr, expectedResult, resultFieldType);
+          sqlExpr, null, expectedResult, resultFieldType);
+    }
+
+    private static ExpressionTestCase of(
+        String sqlExpr, String sqlGroupByExpr, Object expectedResult, FieldType resultFieldType) {
+      return new AutoValue_BeamSqlBuiltinFunctionsIntegrationTestBase_ExpressionTestCase(
+          sqlExpr, sqlGroupByExpr, expectedResult, resultFieldType);
     }
 
     abstract String sqlExpr();
+
+    @Nullable
+    abstract String sqlGroupByExpr();
 
     @Nullable
     abstract Object expectedResult();
@@ -215,21 +224,31 @@ public class BeamSqlBuiltinFunctionsIntegrationTestBase {
     private transient List<ExpressionTestCase> exps = new ArrayList<>();
 
     public ExpressionChecker addExpr(String expression, Object expectedValue) {
-      TypeName resultTypeName = JAVA_CLASS_TO_TYPENAME.get(expectedValue.getClass());
-      checkArgument(
-          resultTypeName != null,
-          String.format(
-              "The type of the expected value '%s' is unknown in 'addExpr(String expression, "
-                  + "Object expectedValue)'. Please use 'addExpr(String expr, Object expected, "
-                  + "FieldType type)' instead and provide the type of the expected object",
-              expectedValue));
+      TypeName resultTypeName = getTypename(expectedValue);
       addExpr(expression, expectedValue, FieldType.of(resultTypeName));
+      return this;
+    }
+
+    public ExpressionChecker addExpr(
+        String expression, Object expectedValue, String groupByExpression) {
+      TypeName resultTypeName = getTypename(expectedValue);
+      addExpr(expression, groupByExpression, expectedValue, FieldType.of(resultTypeName));
       return this;
     }
 
     public ExpressionChecker addExpr(
         String expression, Object expectedValue, FieldType resultFieldType) {
       exps.add(ExpressionTestCase.of(expression, expectedValue, resultFieldType));
+      return this;
+    }
+
+    public ExpressionChecker addExpr(
+        String expression,
+        String groupByExpression,
+        Object expectedValue,
+        FieldType resultFieldType) {
+      exps.add(
+          ExpressionTestCase.of(expression, groupByExpression, expectedValue, resultFieldType));
       return this;
     }
 
@@ -242,8 +261,18 @@ public class BeamSqlBuiltinFunctionsIntegrationTestBase {
 
       for (ExpressionTestCase testCase : exps) {
         String expression = testCase.sqlExpr();
+        String groupByExpression = testCase.sqlGroupByExpr();
         Object expectedValue = testCase.expectedResult();
-        String sql = String.format("SELECT %s FROM PCOLLECTION", expression);
+
+        String sql;
+        if (groupByExpression == null) {
+          sql = String.format("SELECT %s FROM PCOLLECTION", expression);
+        } else {
+          sql =
+              String.format(
+                  "SELECT %s FROM PCOLLECTION GROUP BY %s", expression, groupByExpression);
+        }
+
         Schema schema;
         if (expectedValue == null) {
           schema =
@@ -269,6 +298,19 @@ public class BeamSqlBuiltinFunctionsIntegrationTestBase {
       }
 
       inputCollection.getPipeline().run();
+    }
+
+    private TypeName getTypename(Object expectedValue) {
+      TypeName resultTypeName = JAVA_CLASS_TO_TYPENAME.get(expectedValue.getClass());
+      checkArgument(
+          resultTypeName != null,
+          String.format(
+              "The type of the expected value '%s' is unknown in 'addExpr(String expression, "
+                  + "Object expectedValue)'. Please use 'addExpr(String expr, Object expected, "
+                  + "FieldType type)' instead and provide the type of the expected object",
+              expectedValue));
+
+      return resultTypeName;
     }
   }
 

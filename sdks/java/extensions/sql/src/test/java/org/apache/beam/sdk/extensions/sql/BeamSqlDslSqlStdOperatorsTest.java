@@ -1326,4 +1326,7 @@ public class BeamSqlDslSqlStdOperatorsTest extends BeamSqlBuiltinFunctionsIntegr
 
     checker.buildRunAndCheck();
   }
+
+  @Test
+  @SqlOperatorTest(name = "", kind = "")
 }
