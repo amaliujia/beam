@@ -1328,5 +1328,21 @@ public class BeamSqlDslSqlStdOperatorsTest extends BeamSqlBuiltinFunctionsIntegr
   }
 
   @Test
-  @SqlOperatorTest(name = "", kind = "")
+  @SqlOperatorTest(name = "TUMBLE", kind = "TUMBLE")
+  @SqlOperatorTest(name = "TUMBLE_START", kind = "TUMBLE_START")
+  @SqlOperatorTest(name = "TUMBLE_END", kind = "TUMBLE_END")
+  public void testTumble() {
+    ExpressionChecker checker =
+        new ExpressionChecker()
+            .addExpr(
+                "TUMBLE_START(ts, INTERVAL '1' SECOND)",
+                parseDate("1986-02-15 11:35:26"),
+                "TUMBLE(ts, INTERVAL '1' SECOND)")
+            .addExpr(
+                "TUMBLE_END(ts, INTERVAL '1' SECOND)",
+                parseDate("1986-02-15 11:35:27"),
+                "TUMBLE(ts, INTERVAL '1' SECOND)");
+
+    checker.buildRunAndCheck(getWindowTestPCollection());
+  }
 }

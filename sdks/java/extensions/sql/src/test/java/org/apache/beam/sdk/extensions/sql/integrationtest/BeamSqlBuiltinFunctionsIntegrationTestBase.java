@@ -106,6 +106,9 @@ public class BeamSqlBuiltinFunctionsIntegrationTestBase {
           .addNullableField("c_decimal", FieldType.DECIMAL)
           .build();
 
+  private static final Schema ROW_TYPE_FOUR =
+      Schema.builder().addField("ts", FieldType.DATETIME).build();
+
   @Rule public final TestPipeline pipeline = TestPipeline.create();
 
   protected PCollection<Row> getTestPCollection() {
@@ -170,6 +173,17 @@ public class BeamSqlBuiltinFunctionsIntegrationTestBase {
           .addRows(null, null, null, null, null, null, null, null, null, null)
           .buildIOReader(pipeline.begin())
           .setRowSchema(ROW_TYPE_TWO);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected PCollection<Row> getWindowTestPCollection() {
+    try {
+      return MockedBoundedTable.of(ROW_TYPE_FOUR)
+          .addRows(parseDate("1986-02-15 11:35:26"))
+          .buildIOReader(pipeline.begin())
+          .setRowSchema(ROW_TYPE_FOUR);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
