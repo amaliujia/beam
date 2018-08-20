@@ -79,15 +79,18 @@ public class BeamComplexTypeTest {
               "basicRowTestTable",
               MockedBoundedTable.of(Schema.FieldType.row(innerRowSchema), "col")
                   .addRows(Row.withSchema(innerRowSchema).addValues("innerStr", 1L).build()),
-            "complicatedRowTestTable",
-            MockedBoundedTable.of(Schema.FieldType.row(nestedRowWithArraySchema), "col")
-              .addRows(Row.withSchema(nestedRowWithArraySchema)
-              .addValues(
-                  "str",
-                  Row.withSchema(innerRowWithArraySchema).addValues("inner_str_one", Arrays.asList(1L, 2L, 3L)).build(),
-                  4L,
-                  Arrays.asList(5L, 6L)).build())
-            ));
+              "complicatedRowTestTable",
+              MockedBoundedTable.of(Schema.FieldType.row(nestedRowWithArraySchema), "col")
+                  .addRows(
+                      Row.withSchema(nestedRowWithArraySchema)
+                          .addValues(
+                              "str",
+                              Row.withSchema(innerRowWithArraySchema)
+                                  .addValues("inner_str_one", Arrays.asList(1L, 2L, 3L))
+                                  .build(),
+                              4L,
+                              Arrays.asList(5L, 6L))
+                          .build())));
 
   @Rule public transient TestPipeline pipeline = TestPipeline.create();
 
@@ -96,7 +99,8 @@ public class BeamComplexTypeTest {
     BeamSqlEnv sqlEnv = BeamSqlEnv.inMemory(readOnlyTableProvider);
     PCollection<Row> stream =
         BeamSqlRelUtils.toPCollection(
-            pipeline, sqlEnv.parseQuery("SELECT nestedRowTestTable.col.RowFieldTwo FROM nestedRowTestTable"));
+            pipeline,
+            sqlEnv.parseQuery("SELECT nestedRowTestTable.col.RowFieldTwo FROM nestedRowTestTable"));
     PAssert.that(stream)
         .containsInAnyOrder(
             Row.withSchema(flattenedRowSchema)
@@ -121,9 +125,11 @@ public class BeamComplexTypeTest {
     BeamSqlEnv sqlEnv = BeamSqlEnv.inMemory(readOnlyTableProvider);
     PCollection<Row> stream =
         BeamSqlRelUtils.toPCollection(
-            pipeline, sqlEnv.parseQuery("SELECT complicatedRowTestTable.col.field2 FROM complicatedRowTestTable"));
+            pipeline,
+            sqlEnv.parseQuery(
+                "SELECT complicatedRowTestTable.col.field2 FROM complicatedRowTestTable"));
     PAssert.that(stream).containsInAnyOrder();
-        // .containsInAnyOrder(Row.withSchema(Schema.builder().addInt64Field("int64").build()).addValue(2L).build());
+    // .containsInAnyOrder(Row.withSchema(Schema.builder().addInt64Field("int64").build()).addValue(2L).build());
     pipeline.run().waitUntilFinish(Duration.standardMinutes(2));
   }
 }
