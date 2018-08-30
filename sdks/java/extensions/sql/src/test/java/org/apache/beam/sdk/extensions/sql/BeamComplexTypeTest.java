@@ -211,4 +211,48 @@ public class BeamComplexTypeTest {
                 .build());
     pipeline.run().waitUntilFinish(Duration.standardMinutes(2));
   }
+
+  @Test
+  public void testNestedRowConstructor() {
+    BeamSqlEnv sqlEnv = BeamSqlEnv.inMemory(readOnlyTableProvider);
+    PCollection<Row> stream =
+        BeamSqlRelUtils.toPCollection(
+            pipeline,
+            sqlEnv.parseQuery("SELECT ROW('str', ROW(1, 'inner_str'), 2)"));
+    PAssert.that(stream)
+        .containsInAnyOrder(
+            Row.withSchema(
+                    Schema.builder()
+                        .addStringField("field1")
+                        .addInt32Field("field2")
+                        .addStringField("field3")
+                        .addInt32Field("field4")
+                        .build())
+                .addValues("str", 1, "inner_str", 2)
+                .build());
+    pipeline.run().waitUntilFinish(Duration.standardMinutes(2));
+  }
+
+  @Test
+  public void testNestedRowConstructorSelectFrom() {
+    BeamSqlEnv sqlEnv = BeamSqlEnv.inMemory(readOnlyTableProvider);
+    PCollection<Row> stream =
+        BeamSqlRelUtils.toPCollection(
+            pipeline,
+            sqlEnv.parseQuery("SELECT row_col. FROM (SELECT ROW('str', 'str') as row_col) as a"));
+    // sqlEnv.parseQuery("SELECT col FROM (SELECT 1 as col)"));
+
+    PAssert.that(stream)
+        .containsInAnyOrder(
+            Row.withSchema(
+                Schema.builder()
+                    .addStringField("field1")
+                    .addInt32Field("field2")
+                    .addStringField("field3")
+                    .addInt32Field("field4")
+                    .build())
+                .addValues("str", 1, "inner_str", 2)
+                .build());
+    pipeline.run().waitUntilFinish(Duration.standardMinutes(2));
+  }
 }
