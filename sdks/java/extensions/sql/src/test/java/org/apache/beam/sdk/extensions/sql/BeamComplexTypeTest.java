@@ -86,9 +86,9 @@ public class BeamComplexTypeTest {
               MockedBoundedTable.of(FieldType.array(FieldType.row(innerRowSchema)), "col")
                   .addRows(
                       Arrays.asList(Row.withSchema(innerRowSchema).addValues("str", 1L).build())),
-              "nestedArrayTestTable",
-              MockedBoundedTable.of(FieldType.array(FieldType.array(FieldType.INT64)), "col")
-                  .addRows(Arrays.asList(Arrays.asList(1L, 2L, 3L), Arrays.asList(4L, 5L))),
+              // "nestedArrayTestTable",
+              // MockedBoundedTable.of(FieldType.array(FieldType.array(FieldType.INT64)), "col")
+              //     .addRows(Arrays.asList(Arrays.asList(1L, 2L, 3L), Arrays.asList(4L, 5L))),
               "nestedRowTestTable",
               MockedBoundedTable.of(Schema.FieldType.row(nestedRowSchema), "col")
                   .addRows(
@@ -102,14 +102,18 @@ public class BeamComplexTypeTest {
               "basicRowTestTable",
               MockedBoundedTable.of(Schema.FieldType.row(innerRowSchema), "col")
                   .addRows(Row.withSchema(innerRowSchema).addValues("innerStr", 1L).build()),
+              "basicRowTestTableTwo",
+              MockedBoundedTable.of(Schema.FieldType.row(innerRowSchema), "col"),
               "rowWithArrayTestTable",
               MockedBoundedTable.of(Schema.FieldType.row(rowWithArraySchema), "col")
                   .addRows(
                       Row.withSchema(rowWithArraySchema)
                           .addValues("str", 4L, Arrays.asList(5L, 6L))
-                          .build())));
+                          .build())
+          ));
 
   @Rule public transient TestPipeline pipeline = TestPipeline.create();
+  @Rule public transient TestPipeline pipeline2 = TestPipeline.create();
 
   @Test
   public void testNestedRow() {
@@ -239,20 +243,34 @@ public class BeamComplexTypeTest {
     PCollection<Row> stream =
         BeamSqlRelUtils.toPCollection(
             pipeline,
-            sqlEnv.parseQuery("SELECT row_col. FROM (SELECT ROW('str', 'str') as row_col) as a"));
+            sqlEnv.parseQuery("INSERT INTO basicRowTestTable SELECT col from basicRowTestTable"));
+            // sqlEnv.parseQuery("SELECT a.col.nonRowfield1 FROM (SELECT col from nestedRowTestTable) as a "));
     // sqlEnv.parseQuery("SELECT col FROM (SELECT 1 as col)"));
 
-    PAssert.that(stream)
-        .containsInAnyOrder(
-            Row.withSchema(
-                Schema.builder()
-                    .addStringField("field1")
-                    .addInt32Field("field2")
-                    .addStringField("field3")
-                    .addInt32Field("field4")
-                    .build())
-                .addValues("str", 1, "inner_str", 2)
-                .build());
+    // stream =
+    //     BeamSqlRelUtils.toPCollection(
+    //         pipeline,
+    //         sqlEnv.parseQuery("SELECT COUNT(*) FROM basicRowTestTable"));
+    // PAssert.that(stream)
+    //     .containsInAnyOrder();
+            // Row.withSchema(
+            //     Schema.builder()
+            //         .addStringField("field1")
+            //         // .addInt32Field("field2")
+            //         .addStringField("field3")
+            //         .addStringField("field3")
+            //         // .addInt32Field("field4")
+            //         .build())
+            //     .addValues("str", "str", "str")
+            //     .build());
     pipeline.run().waitUntilFinish(Duration.standardMinutes(2));
+
+    PCollection<Row> r =
+        BeamSqlRelUtils.toPCollection(
+            pipeline2,
+            sqlEnv.parseQuery("SELECT * FROM basicRowTestTable"));
+    PAssert.that(r)
+        .containsInAnyOrder();
+    pipeline2.run().waitUntilFinish(Duration.standardMinutes(2));
   }
 }

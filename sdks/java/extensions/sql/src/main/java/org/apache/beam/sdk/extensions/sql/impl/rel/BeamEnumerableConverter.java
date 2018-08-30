@@ -304,7 +304,11 @@ public class BeamEnumerableConverter extends ConverterImpl implements Enumerable
                   MetricsFilter.builder()
                       .addNameFilter(MetricNameFilter.named(BeamEnumerableConverter.class, "rows"))
                       .build());
-      count = metrics.getCounters().iterator().next().getAttempted();
+      try {
+        count = metrics.getCounters().iterator().next().getAttempted();
+      } catch (java.util.NoSuchElementException e) {
+        count = 0;
+      }
     }
     return Linq4j.singletonEnumerable(count);
   }

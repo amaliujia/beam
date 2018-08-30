@@ -100,7 +100,9 @@ public class MockedBoundedTable extends MockedTable {
             new DoFn<Row, Void>() {
               @ProcessElement
               public void processElement(ProcessContext c) {
+                rows.add(c.element());
                 CONTENT.add(c.element());
+                // CONTENT.add(c.element());
               }
 
               @Teardown
