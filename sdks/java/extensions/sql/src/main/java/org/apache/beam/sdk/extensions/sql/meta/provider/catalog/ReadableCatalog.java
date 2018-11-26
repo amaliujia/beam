@@ -1,13 +1,13 @@
-package org.apache.beam.sdk.extensions.sql.meta.catalog;
+package org.apache.beam.sdk.extensions.sql.meta.provider.catalog;
 
+import java.util.Collections;
 import java.util.Map;
 import org.apache.beam.sdk.annotations.Experimental;
-import org.apache.beam.sdk.extensions.sql.BeamSqlTable;
 import org.apache.beam.sdk.extensions.sql.meta.Table;
 import org.apache.beam.sdk.extensions.sql.meta.provider.TableProvider;
 
 @Experimental
-abstract class ReadableCatalog implements TableProvider {
+public abstract class ReadableCatalog implements TableProvider {
 
   @Override
   public final void createTable(Table table) {
@@ -18,4 +18,11 @@ abstract class ReadableCatalog implements TableProvider {
   public final void dropTable(String tableName) {
     // No-op
   }
+
+  @Override
+  public Map<String, Table> getTables() {
+    return Collections.emptyMap();
+  }
+
+  public abstract void fetchExternalMetadata() throws Exception;
 }
