@@ -42,7 +42,7 @@ public interface TableProvider {
   void dropTable(String tableName);
 
   /** Get all tables from this provider. */
-  Map<String, Table> getTables();
+  Map<String, Table> getTables() throws Exception;
 
   /** Build a {@link BeamSqlTable} using the given table meta info. */
   BeamSqlTable buildBeamSqlTable(Table table);

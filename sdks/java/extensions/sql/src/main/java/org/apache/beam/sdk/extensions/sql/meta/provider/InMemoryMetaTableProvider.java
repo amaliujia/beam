@@ -37,7 +37,7 @@ public abstract class InMemoryMetaTableProvider implements TableProvider {
   }
 
   @Override
-  public Map<String, Table> getTables() {
+  public Map<String, Table> getTables() throws Exception {
     return Collections.emptyMap();
   }
 }
