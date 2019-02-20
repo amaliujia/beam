@@ -18,12 +18,16 @@
 package org.apache.beam.sdk.extensions.sql.impl.utils;
 
 import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.Map;
 import java.util.stream.IntStream;
+import org.apache.beam.sdk.schemas.LogicalTypes;
 import org.apache.beam.sdk.schemas.LogicalTypes.PassThroughLogicalType;
 import org.apache.beam.sdk.schemas.Schema;
 import org.apache.beam.sdk.schemas.Schema.FieldType;
+import org.apache.beam.sdk.schemas.Schema.LogicalType;
 import org.apache.beam.sdk.schemas.Schema.TypeName;
 import org.apache.beam.vendor.guava.v20_0.com.google.common.collect.BiMap;
 import org.apache.beam.vendor.guava.v20_0.com.google.common.collect.ImmutableBiMap;
@@ -85,6 +89,36 @@ public class CalciteUtils {
 
     public CharType() {
       super(IDENTIFIER, "", FieldType.STRING);
+    }
+  }
+
+  public static class TimeNanosecondType implements LogicalType<LocalTime, byte[]> {
+    public static final String IDENTIFIER = "SqlTimeNanosecondType";
+
+    @Override
+    public String getIdentifier() {
+      return IDENTIFIER;
+    }
+
+    @Override
+    public FieldType getBaseType() {
+      return FieldType.BYTES;
+    }
+
+    @Override
+    public byte[] toBaseType(LocalTime input) {
+      ByteBuffer buffer = ByteBuffer.allocate(4 * Integer.BYTES);
+      buffer.putInt(input.getHour());
+      buffer.putInt(input.getMinute());
+      buffer.putInt(input.getSecond());
+      buffer.putInt(input.getNano());
+      return buffer.array();
+    }
+
+    @Override
+    public LocalTime toInputType(byte[] base) {
+      ByteBuffer buffer = ByteBuffer.wrap(base);
+      return LocalTime.of(buffer.getInt(), buffer.getInt(), buffer.getInt(), buffer.getInt());
     }
   }
 
