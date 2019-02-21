@@ -181,6 +181,11 @@ public abstract class Row implements Serializable {
     return getBoolean(getSchema().indexOf(fieldName));
   }
 
+  @Nullable
+  public <T> T getLogicalTypeValue(String fieldName) {
+    return getLogicalTypeValue(getSchema().indexOf(fieldName));
+  }
+
   /**
    * Get an array value by field name, {@link IllegalStateException} is thrown if schema doesn't
    * match.
@@ -305,6 +310,11 @@ public abstract class Row implements Serializable {
   @Nullable
   public Boolean getBoolean(int idx) {
     return getValue(idx);
+  }
+
+  @Nullable
+  public <InputT> InputT getLogicalTypeValue(int idx) {
+    return getSchema().getField(idx).getType().getLogicalType().toInputType(getValue(idx));
   }
 
   /**

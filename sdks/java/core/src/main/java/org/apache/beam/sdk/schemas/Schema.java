@@ -468,23 +468,23 @@ public class Schema implements Serializable {
    * @param <InputT> The Java type used to set the type when using {@link Row.Builder#addValue}.
    * @param <BaseT> The Java type for the underlying storage.
    */
-  public interface LogicalType<InputT, BaseT> extends Serializable {
+  public abstract class LogicalType<InputT, BaseT> implements Serializable {
     /** The unique identifier for this type. */
-    String getIdentifier();
+    abstract String getIdentifier();
 
     /** An optional argument to configure the type. */
-    default String getArgument() {
+    public String getArgument() {
       return "";
     }
 
     /** The base {@link FieldType} used to store values of this type. */
-    FieldType getBaseType();
+    public abstract FieldType getBaseType();
 
     /** Convert the input Java type to one appropriate for the base {@link FieldType}. */
-    BaseT toBaseType(InputT input);
+    public abstract BaseT toBaseType(InputT input);
 
     /** Convert the Java type used by the base {@link FieldType} to the input type. */
-    InputT toInputType(BaseT base);
+    public abstract InputT toInputType(BaseT base);
   }
 
   /**

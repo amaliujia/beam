@@ -29,8 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.apache.beam.sdk.schemas.LogicalTypes.PassThroughLogicalType;
 import org.apache.beam.sdk.schemas.Schema;
 import org.apache.beam.sdk.schemas.Schema.FieldType;
+import org.apache.beam.sdk.schemas.SchemaTest.TestType;
 import org.apache.beam.vendor.guava.v20_0.com.google.common.collect.ImmutableList;
 import org.apache.beam.vendor.guava.v20_0.com.google.common.collect.ImmutableMap;
 import org.apache.beam.vendor.guava.v20_0.com.google.common.collect.Lists;
@@ -393,5 +395,22 @@ public class RowTest {
     Row b = Row.withSchema(schema).addValue(ByteBuffer.wrap(b0)).build();
 
     Assert.assertEquals(a, b);
+  }
+
+  static class TestType extends PassThroughLogicalType<Long> {
+    public final static PassThroughLogicalType INSTANTCE = new TestType("id", "arg");
+
+    TestType(String id, String arg) {
+      super(id, arg, FieldType.INT64);
+    }
+  }
+
+  @Test
+  public void testLogicalTypeGetterInRow() {
+    Schema schema =
+        Schema.builder().addLogicalTypeField("logical", TestType.INSTANTCE).build();
+
+    Row testRow = Row.withSchema(schema).addValue(TestType.INSTANTCE.toBaseType(1L)).build();
+    assertEquals(1L, testRow.getLogicalTypeValue(0));
   }
 }

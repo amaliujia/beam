@@ -26,7 +26,7 @@ import org.apache.beam.sdk.schemas.Schema.LogicalType;
 /** A collection of common {@link Schema.LogicalType} classes. */
 public class LogicalTypes {
   /** A base class for LogicalTypes that use the same Java type as the underlying base type. */
-  public abstract static class PassThroughLogicalType<T> implements LogicalType<T, T> {
+  public abstract static class PassThroughLogicalType<T> extends LogicalType<T, T> {
     private final String identifier;
     private final String argument;
     private final FieldType fieldType;
