@@ -147,7 +147,7 @@ public class BeamCalcRel extends Calc implements BeamRelNode {
               conformance);
 
       List<Expression> expressions =
-          org.apache.beam.sdk.extensions.sql.codegen.RexToLixTranslator.translateProjects(
+          RexToLixTranslator.translateProjects(
               program,
               typeFactory,
               conformance,
