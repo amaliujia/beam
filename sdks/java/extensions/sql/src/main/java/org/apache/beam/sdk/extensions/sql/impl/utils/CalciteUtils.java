@@ -61,6 +61,15 @@ public class CalciteUtils {
     }
   }
 
+  /** A LogicalType corresponding to DATETIME. */
+  public static class DateTimeType extends PassThroughLogicalType<Instant> {
+    public static final String IDENTIFIER = "SqlDateTimeType";
+
+    public DateTimeType() {
+      super(IDENTIFIER, "", FieldType.DATETIME);
+    }
+  }
+
   /** A LogicalType corresponding to TIME_WITH_LOCAL_TIME_ZONE. */
   public static class TimeWithLocalTzType extends PassThroughLogicalType<Instant> {
     public static final String IDENTIFIER = "SqlTimeWithLocalTzType";
@@ -99,7 +108,8 @@ public class CalciteUtils {
       return logicalId.equals(DateType.IDENTIFIER)
           || logicalId.equals(TimeType.IDENTIFIER)
           || logicalId.equals(TimeWithLocalTzType.IDENTIFIER)
-          || logicalId.equals(TimestampWithLocalTzType.IDENTIFIER);
+          || logicalId.equals(TimestampWithLocalTzType.IDENTIFIER)
+          || logicalId.equals(DateTimeType.IDENTIFIER);
     }
     return false;
   }
@@ -130,6 +140,7 @@ public class CalciteUtils {
   public static final FieldType CHAR = FieldType.logicalType(new CharType());
   public static final FieldType DATE = FieldType.logicalType(new DateType());
   public static final FieldType TIME = FieldType.logicalType(new TimeType());
+  public static final FieldType DATETIME = FieldType.logicalType(new DateTimeType());
   public static final FieldType TIME_WITH_LOCAL_TZ =
       FieldType.logicalType(new TimeWithLocalTzType());
   public static final FieldType TIMESTAMP = FieldType.DATETIME;
