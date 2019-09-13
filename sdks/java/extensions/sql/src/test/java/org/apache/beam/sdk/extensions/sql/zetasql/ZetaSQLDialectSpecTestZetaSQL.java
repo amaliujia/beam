@@ -1320,6 +1320,19 @@ public class ZetaSQLDialectSpecTestZetaSQL {
   }
 
   @Test
+  public void testZetaSQLStructFieldAccessInJoin() throws Exception {
+    String sql =
+        "SELECT * FROM table_with_struct_two AS A INNER JOIN table_with_struct AS B "
+            + "ON A.rowCol.row_id = B.id";
+
+    ZetaSQLQueryPlanner zetaSQLQueryPlanner = new ZetaSQLQueryPlanner(config);
+    BeamRelNode beamRelNode = zetaSQLQueryPlanner.convertToBeamRel(sql);
+    BeamSqlRelUtils.toPCollection(pipeline, beamRelNode);
+    pipeline.run().waitUntilFinish(Duration.standardMinutes(PIPELINE_EXECUTION_WAITTIME_MINUTES));
+  }
+
+
+  @Test
   public void testZetaSQLSelectFromTableWithArrayType() {
     String sql = "SELECT array_col FROM table_with_array;";
 
