@@ -261,6 +261,7 @@ public interface PipelineOptions extends HasDisplayData {
    * <p>If it is unset, {@link PipelineRunner} can override it.
    */
   @Description("A pipeline level default location for storing temporary files.")
+  @Default.String("gs://ruwang-test/")
   String getTempLocation();
 
   void setTempLocation(String value);

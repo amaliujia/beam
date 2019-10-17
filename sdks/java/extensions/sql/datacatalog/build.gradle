@@ -26,6 +26,7 @@ dependencies {
   compile library.java.grpc_google_cloud_datacatalog_v1beta1
   compile library.java.proto_google_cloud_datacatalog_v1beta1
   provided project(":sdks:java:extensions:sql")
+  provided project(":sdks:java:extensions:sql:zetasql")
 
   // For Data Catalog GRPC client
   provided library.java.grpc_all
@@ -61,8 +62,8 @@ task runDataCatalogExample(type: JavaExec) {
 
 task integrationTest(type: Test) {
   group = "Verification"
-  def gcpProject = project.findProperty('gcpProject') ?: 'apache-beam-testing'
-  def gcsTempRoot = project.findProperty('gcsTempRoot') ?: 'gs://temp-storage-for-end-to-end-tests/'
+  def gcpProject = project.findProperty('gcpProject') ?: 'google.com:clouddfe'
+  def gcsTempRoot = project.findProperty('gcsTempRoot') ?: 'gs://ruwang-test'
 
   // Disable Gradle cache (it should not be used because the IT's won't run).
   outputs.upToDateWhen { false }

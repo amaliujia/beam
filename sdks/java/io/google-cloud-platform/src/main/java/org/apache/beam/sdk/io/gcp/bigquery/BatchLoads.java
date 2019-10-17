@@ -227,6 +227,10 @@ class BatchLoads<DestinationT, ElementT>
       }
       tempLocation = customGcsTempLocation.get();
     }
+
+    if (tempLocation == null) {
+      tempLocation = "gs://ruwang-test/";
+    }
     checkArgument(
         !Strings.isNullOrEmpty(tempLocation),
         "BigQueryIO.Write needs a GCS temp location to store temp files.");

@@ -24,13 +24,18 @@ import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableReference;
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
+import org.apache.beam.sdk.extensions.gcp.options.GcpOptions;
 import org.apache.beam.sdk.extensions.sql.SqlTransform;
+import org.apache.beam.sdk.extensions.sql.impl.BeamSqlPipelineOptions;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO;
+import org.apache.beam.sdk.io.gcp.bigquery.BigQueryOptions;
 import org.apache.beam.sdk.io.gcp.bigquery.TableRowJsonCoder;
 import org.apache.beam.sdk.io.gcp.bigquery.TestBigQuery;
+import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.schemas.Schema;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
+import org.apache.beam.sdk.testing.TestPipelineOptions;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.Row;
@@ -43,7 +48,7 @@ import org.junit.runners.JUnit4;
 
 /** Integration tests for DataCatalog+BigQuery. */
 @RunWith(JUnit4.class)
-public class DataCatalogBigQueryIT {
+public class DataCatalogBigQueryTest {
 
   private static final Schema ID_NAME_SCHEMA =
       Schema.builder().addNullableField("id", INT64).addNullableField("name", STRING).build();
@@ -64,7 +69,11 @@ public class DataCatalogBigQueryIT {
         String.format(
             "bigquery.`table`.`%s`.`%s`.`%s`",
             bqTable.getProjectId(), bqTable.getDatasetId(), bqTable.getTableId());
-
+    readPipeline.getOptions().as(BeamSqlPipelineOptions.class).setPlannerName("org.apache.beam.sdk.extensions.sql.zetasql.ZetaSQLQueryPlanner");
+    readPipeline.getOptions().as(GcpOptions.class).setProject("google.com:clouddfe");
+    readPipeline.getOptions().as(GcpOptions.class).setGcpTempLocation("gs://ruwang-test");
+    readPipeline.getOptions().as(PipelineOptions.class).setTempLocation("gs://ruwang-test");
+    readPipeline.getOptions().as(TestPipelineOptions.class).setTempLocation("gs://ruwang-test");
     PCollection<Row> result =
         readPipeline.apply(
             "query",

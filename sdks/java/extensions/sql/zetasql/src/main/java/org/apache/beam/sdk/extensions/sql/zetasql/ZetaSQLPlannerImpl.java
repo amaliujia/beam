@@ -29,6 +29,8 @@ import org.apache.beam.sdk.extensions.sql.zetasql.translation.ExpressionConverte
 import org.apache.beam.sdk.extensions.sql.zetasql.translation.QueryStatementConverter;
 import org.apache.beam.vendor.calcite.v1_20_0.com.google.common.collect.ImmutableList;
 import org.apache.beam.vendor.calcite.v1_20_0.org.apache.calcite.adapter.java.JavaTypeFactory;
+import org.apache.beam.vendor.calcite.v1_20_0.org.apache.calcite.plan.Context;
+import org.apache.beam.vendor.calcite.v1_20_0.org.apache.calcite.plan.Contexts;
 import org.apache.beam.vendor.calcite.v1_20_0.org.apache.calcite.plan.RelOptCluster;
 import org.apache.beam.vendor.calcite.v1_20_0.org.apache.calcite.plan.RelOptPlanner;
 import org.apache.beam.vendor.calcite.v1_20_0.org.apache.calcite.plan.RelTraitSet;
@@ -127,10 +129,17 @@ public class ZetaSQLPlannerImpl implements Planner {
 
     QueryTrait trait = new QueryTrait();
 
+    Object[] contexts =
+        ImmutableList.of(
+            config.getContext(),
+            TableResolutionContext.joinCompoundIds("datacatalog"))
+            .toArray();
+
     ResolvedStatement statement =
         SqlAnalyzer.withQueryParams(params)
             .withQueryTrait(trait)
-            .withCalciteContext(config.getContext())
+            .withCalciteContext(Contexts.of(contexts))
+            // .withCalciteContext(config.getContext())
             .withTopLevelSchema(defaultSchemaPlus)
             .withTypeFactory((JavaTypeFactory) cluster.getTypeFactory())
             .analyze(sql);

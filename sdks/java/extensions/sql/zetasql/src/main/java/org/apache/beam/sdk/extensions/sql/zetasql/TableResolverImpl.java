@@ -34,17 +34,17 @@ class TableResolverImpl {
    * <p>I.e. drills down into schema.getSubschema() until the second last element of the table path,
    * then calls schema.getTable().
    */
-  static Table assumeLeafIsTable(Schema schema, List<String> tablePath) {
-    Schema subSchema = schema;
-
-    // subSchema.getSubschema() for all except last
-    for (int i = 0; i < tablePath.size() - 1; i++) {
-      subSchema = subSchema.getSubSchema(tablePath.get(i));
-    }
-
-    // for the final one call getTable()
-    return subSchema.getTable(Iterables.getLast(tablePath));
-  }
+  // static Table assumeLeafIsTable(Schema schema, List<String> tablePath) {
+  //   Schema subSchema = schema;
+  //
+  //   // subSchema.getSubschema() for all except last
+  //   for (int i = 0; i < tablePath.size() - 1; i++) {
+  //     subSchema = subSchema.getSubSchema(tablePath.get(i));
+  //   }
+  //
+  //   // for the final one call getTable()
+  //   return subSchema.getTable(Iterables.getLast(tablePath));
+  // }
 
   /**
    * Joins the table name parts into a single ZetaSQL-compatible compound identifier, then calls
